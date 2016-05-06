@@ -111,10 +111,7 @@
             // Create a mesh and insert the geometry and the material. Translate the whole mesh
             // by -1.5 on the x axis and by 4 on the z axis. Finally add the mesh to the scene.
             pyramidMesh = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
-            pyramidMesh.position.set(-4, 3.0, 0.0);
-            pyramidMesh.position.x = 10;
-            pyramidMesh.position.y = 10;
-            pyramidMesh.position.z = 0;
+            pyramidMesh.position.set(10, 13, 0);
             pyramidMesh.castShadow = true;
             scene.add(pyramidMesh);
 
