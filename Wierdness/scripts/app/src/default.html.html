@@ -62,7 +62,7 @@
             // Parameter 5 'openEnded': Allows to have open ends ('true') or closed ends ('false')
             //                          of the cylindern. Since the pyramid shall have a bottom
             //                          face, we set it to 'false'.
-            var pyramidGeometry = new THREE.CylinderGeometry(0, 6, 6, 6, false);
+            var pyramidGeometry = new THREE.CylinderGeometry(0, 6, 6, 4, false);
 
             // Coloring the faces with vertex colors is a bit tricky, but allows us to see how to
             // loop through the faces and check whether they have three or four vertices.
@@ -87,9 +87,14 @@
                     }
                     pyramidGeometry.faces[i].vertexColors[3] = new THREE.Color(0xFF0000);
                 } else {
-                    pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000);
-                    pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00);
-                    pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF);
+                    var face_color = new THREE.Color(0xFF0000);                    
+                    if ((i % 2) == 0) {
+                        var face_color = new THREE.Color(0x0000FF);
+                    }
+                    pyramidGeometry.faces[i].vertexColors[0] = face_color;
+                    pyramidGeometry.faces[i].vertexColors[1] = face_color;
+                    pyramidGeometry.faces[i].vertexColors[2] = face_color;
+
                 }
             }
 
@@ -105,7 +110,7 @@
             // 'doubleSided' to 'true'.
             var pyramidMaterial = new THREE.MeshBasicMaterial({
                 vertexColors: THREE.VertexColors,
-                side: THREE.DoubleSide
+                wireframe: true
             });
 
             // Create a mesh and insert the geometry and the material. Translate the whole mesh
