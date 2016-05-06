@@ -6,7 +6,6 @@
     <title>Example 01.04 - Materials, light and animation</title>
     <script type="text/javascript" src="../libs/three.js"></script>
 
-    <script type="text/javascript" src="../libs/stats.js"></script>
     <style>
         body {
             /* set margin to 0 and overflow to hidden, to go fullscreen */
@@ -17,7 +16,6 @@
 </head>
 <body>
 
-<div id="Stats-output">
 </div>
 <!-- Div which will hold the Output -->
 <div id="WebGL-output">
@@ -28,8 +26,6 @@
 
     // once everything is loaded, we run our Three.js stuff.
     function init() {
-
-        var stats = initStats();
 
         // create a scene, that will hold all our elements such as objects, cameras and lights.
         var scene = new THREE.Scene();
@@ -110,7 +106,6 @@
         renderScene();
 
         function renderScene() {
-            stats.update();
             // rotate the cube around its axes
             cube.rotation.x += 0.02;
             cube.rotation.y += 0.02;
@@ -126,21 +121,6 @@
             renderer.render(scene, camera);
         }
 
-        function initStats() {
-
-            var stats = new Stats();
-
-            stats.setMode(0); // 0: fps, 1: ms
-
-            // Align top-left
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.left = '0px';
-            stats.domElement.style.top = '0px';
-
-            document.getElementById("Stats-output").appendChild(stats.domElement);
-
-            return stats;
-        }
     }
     window.onload = init;
 
