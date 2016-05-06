@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-    <title>Example 01.04 - Materials, light and animation</title>
+    <title>Wierdness, by Seamus Stevick</title>
     <script type="text/javascript" src="../libs/three.js"></script>
-
     <style>
         body {
             /* set margin to 0 and overflow to hidden, to go fullscreen */
@@ -15,92 +12,160 @@
     </style>
 </head>
 <body>
+    </div>
+    <!-- Div which will hold the Output -->
+    <div id="WebGL-output">
+    </div>
+    <!-- Javascript code that runs our Three.js examples -->
+    <script type="text/javascript">
 
-</div>
-<!-- Div which will hold the Output -->
-<div id="WebGL-output">
-</div>
+        // once everything is loaded, we run our Three.js stuff.
+        function init() {
 
-<!-- Javascript code that runs our Three.js examples -->
-<script type="text/javascript">
+            // create a scene, that will hold all our elements such as objects, cameras and lights.
+            var scene = new THREE.Scene();
 
-    // once everything is loaded, we run our Three.js stuff.
-    function init() {
+            // create a camera, which defines where we're looking at.
+            var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-        // create a scene, that will hold all our elements such as objects, cameras and lights.
-        var scene = new THREE.Scene();
+            // create a render and set the size
+            var renderer = new THREE.WebGLRenderer();
 
-        // create a camera, which defines where we're looking at.
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMapEnabled = true;
 
-        // create a render and set the size
-        var renderer = new THREE.WebGLRenderer();
+            // create the ground plane
+            var planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
+            var planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.receiveShadow = true;
 
-        renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMapEnabled = true;
+            // rotate and position the plane
+            plane.rotation.x = -0.5 * Math.PI;
+            plane.position.x = 15;
+            plane.position.y = 0;
+            plane.position.z = 0;
 
-        // create the ground plane
-        var planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
-        var planeMaterial = new THREE.MeshLambertMaterial({color: 0xffffff});
-        var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-        plane.receiveShadow = true;
+            // add the plane to the scene
+            scene.add(plane);
 
-        // rotate and position the plane
-        plane.rotation.x = -0.5 * Math.PI;
-        plane.position.x = 15;
-        plane.position.y = 0;
-        plane.position.z = 0;
+            // create a pyramid
+            // To create a pyramid, we use THREE.CylinderGeometry. By its five parameters, we are
+            // able to create the geometry of the pyramid (subtype of a cylinder).
+            // Parameter 1 'radiusTop': Controls the radius of the upper end of the cylinder. If we
+            //                          set to to '0', we have a cone.
+            // Parameter 2 'radiusBottom': Controls the radius of the lower end.
+            // Parameter 3 'height': Sets the height of the cylinder.
+            // Parameter 4 'segments': Number of segments, forming the cylindrical shell. To create
+            //                         a pyramid, we choose '4'.
+            // Parameter 5 'openEnded': Allows to have open ends ('true') or closed ends ('false')
+            //                          of the cylindern. Since the pyramid shall have a bottom
+            //                          face, we set it to 'false'.
+            var pyramidGeometry = new THREE.CylinderGeometry(0, 6, 6, 6, false);
 
-        // add the plane to the scene
-        scene.add(plane);
+            // Coloring the faces with vertex colors is a bit tricky, but allows us to see how to
+            // loop through the faces and check whether they have three or four vertices.
+            // With a simple 'for'-loop we run through all faces, which are accessed by their index.
+            // The 'instanceof' operator gives the possibility to check, whether the current face is
+            // a THREE.Face4 or THREE.Face3. Depending on its object type, we set three or four
+            // vertex colors. For THREE.Face4 we switch the colors of vertex 1 and 2 for every
+            // second face because we want the lower vertices having the same colors as the
+            // neighbour face. Vertex 0 and 3 are the upper vertices, which are always red.
+            // If WebGL isn't supported and the canvas renderer is used, it ignores the vertex
+            // colors. They are only supported by the WebGL renderer (current release of
+            // Three.js: 49).
+            for (i = 0; i < pyramidGeometry.faces.length; i++) {
+                if (pyramidGeometry.faces[i] instanceof THREE.Face4) {
+                    pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000);
+                    if ((i % 2) == 0) {
+                        pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00);
+                        pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF);
+                    } else {
+                        pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x0000FF);
+                        pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x00FF00);
+                    }
+                    pyramidGeometry.faces[i].vertexColors[3] = new THREE.Color(0xFF0000);
+                } else {
+                    pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000);
+                    pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00);
+                    pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF);
+                }
+            }
 
-        // create a cube
-        var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
-        var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
-        var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-        cube.castShadow = true;
+            // To activate the vertex color, we have to set 'vertexColors' attribute to
+            // 'THREE.VertexColors'. Otherwise they won't be displayed.
 
-        // position the cube
-        cube.position.x = -4;
-        cube.position.y = 3;
-        cube.position.z = 0;
+            // Create a basic material, supporting vertex colors. Activate the 'doubleSided'
+            // attribute to force the rendering of both sides of each face (front and back).
+            // This prevents the so called 'backface culling'. Usually, only the side is
+            // rendered, whose normal vector points towards the camera. The other side is not
+            // rendered (backface culling). But this performance optimization sometimes leads
+            // to wholes in the surface. When this happens in your surface, simply set
+            // 'doubleSided' to 'true'.
+            var pyramidMaterial = new THREE.MeshBasicMaterial({
+                vertexColors: THREE.VertexColors,
+                side: THREE.DoubleSide
+            });
 
-        // add the cube to the scene
-        scene.add(cube);
+            // Create a mesh and insert the geometry and the material. Translate the whole mesh
+            // by -1.5 on the x axis and by 4 on the z axis. Finally add the mesh to the scene.
+            pyramidMesh = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
+            pyramidMesh.position.set(-4, 3.0, 0.0);
+            pyramidMesh.position.x = 10;
+            pyramidMesh.position.y = 10;
+            pyramidMesh.position.z = 0;
+            pyramidMesh.castShadow = true;
+            scene.add(pyramidMesh);
 
-        // position and point the camera to the center of the scene
-        camera.position.x = -30;
-        camera.position.y = 40;
-        camera.position.z = 30;
-        camera.lookAt(scene.position);
+            var axisHelper = new THREE.AxisHelper(5);
+            scene.add(axisHelper);
+            // create a cube
+            var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+            var cubeMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+            var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            cube.castShadow = true;
+            cube.receiveShadow = true;
+            // position the cube
+            cube.position.x = 10;
+            cube.position.y = 3;
+            cube.position.z = 0;
 
-        // add subtle ambient lighting
-        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
-        scene.add(ambientLight);
+            // add the cube to the scene
+            scene.add(cube);
 
-        // add spotlight for the shadows
-        var spotLight = new THREE.SpotLight(0xffffff);
-        spotLight.position.set(-40, 60, -10);
-        spotLight.castShadow = true;
-        scene.add(spotLight);
+            // position and point the camera to the center of the scene
+            camera.position.x = -30;
+            camera.position.y = 40;
+            camera.position.z = 30;
+            camera.lookAt(scene.position);
 
-        // add the output of the renderer to the html element
-        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+            // add subtle ambient lighting
+            var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+            scene.add(ambientLight);
 
-        // call the render function
-        var step = 0;
-        renderScene();
+            // add spotlight for the shadows
+            var spotLight = new THREE.SpotLight(0xffffff);
+            spotLight.position.set(-40, 60, -10);
+            spotLight.castShadow = true;
+            scene.add(spotLight);
 
-        function renderScene() {
-            // render using requestAnimationFrame
-            requestAnimationFrame(renderScene);
-            renderer.render(scene, camera);
+            // add the output of the renderer to the html element
+            document.getElementById("WebGL-output").appendChild(renderer.domElement);
+
+            // call the render function
+            var step = 0;
+            renderScene();
+
+            function renderScene() {
+                // render using requestAnimationFrame
+                requestAnimationFrame(renderScene);
+                renderer.render(scene, camera);
+            }
+
         }
+        window.onload = init;
 
-    }
-    window.onload = init;
-
-</script>
+    </script>
 </body>
 </html>
